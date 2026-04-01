@@ -180,13 +180,16 @@ document.addEventListener('DOMContentLoaded', function() {
     var capFields = {{ cap_fields_json | tojson }};
     var capDetails = {{ cap_details_json | tojson }};
     var catExpanded = {{ cat_expanded_json | tojson }};
-    var bgColors = [
-        'rgba(99,161,218,0.7)','rgba(99,161,218,0.7)','rgba(99,161,218,0.7)','rgba(99,161,218,0.7)','rgba(99,161,218,0.7)','rgba(99,161,218,0.7)','rgba(99,161,218,0.7)','rgba(99,161,218,0.7)','rgba(99,161,218,0.7)','rgba(99,161,218,0.7)','rgba(99,161,218,0.7)','rgba(99,161,218,0.7)',
-        'rgba(81,162,218,0.7)','rgba(81,162,218,0.7)','rgba(81,162,218,0.7)','rgba(81,162,218,0.7)','rgba(81,162,218,0.7)','rgba(81,162,218,0.7)','rgba(81,162,218,0.7)','rgba(81,162,218,0.7)',
-        'rgba(60,110,180,0.7)','rgba(60,110,180,0.7)','rgba(60,110,180,0.7)','rgba(60,110,180,0.7)','rgba(60,110,180,0.7)','rgba(60,110,180,0.7)','rgba(60,110,180,0.7)','rgba(60,110,180,0.7)','rgba(60,110,180,0.7)','rgba(60,110,180,0.7)',
-        'rgba(41,65,114,0.7)','rgba(41,65,114,0.7)','rgba(41,65,114,0.7)','rgba(41,65,114,0.7)','rgba(41,65,114,0.7)','rgba(41,65,114,0.7)','rgba(41,65,114,0.7)','rgba(41,65,114,0.7)',
-        'rgba(29,45,80,0.7)','rgba(29,45,80,0.7)','rgba(29,45,80,0.7)','rgba(29,45,80,0.7)'
-    ];
+    // Category colors: Code=#51a2da, Build&Test=#a07cbc, Release=#e59728, Operate=#79db32, Optimize=#db3279
+    var catColors = {
+        a: 'rgba(81,162,218,0.7)',  // Code (12 capabilities)
+        b: 'rgba(160,124,188,0.7)', // Build & Test (8)
+        c: 'rgba(229,151,40,0.7)',  // Release (10)
+        d: 'rgba(121,219,50,0.7)',  // Operate (8)
+        e: 'rgba(219,50,121,0.7)'   // Optimize (4)
+    };
+    var bgColors = [];
+    capFields.forEach(function(f) { bgColors.push(catColors[f[0]]); });
 
     var ctx = document.getElementById("category-average-graph");
     var capChart = new Chart(ctx, {
@@ -197,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 type: 'line',
                 label: 'Category Average',
                 data: catExpanded,
-                borderColor: '#e59728',
+                borderColor: '#294172',
                 borderWidth: 2,
                 lineTension: 0.3,
                 pointRadius: 0,
