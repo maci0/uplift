@@ -184,6 +184,12 @@ footer {
     background: linear-gradient(135deg, #1d2d50 0%, #294172 100%);
     margin: 0 24px;
     border-radius: 0 0 12px 12px;
+    overflow: hidden;
+}
+
+.stats.row {
+    margin-left: 0;
+    margin-right: 0;
 }
 
 .stats-item {
