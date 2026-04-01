@@ -180,16 +180,25 @@ document.addEventListener('DOMContentLoaded', function() {
     var capFields = {{ cap_fields_json | tojson }};
     var capDetails = {{ cap_details_json | tojson }};
     var catExpanded = {{ cat_expanded_json | tojson }};
-    // Category colors: Code=#51a2da, Build&Test=#a07cbc, Release=#e59728, Operate=#79db32, Optimize=#db3279
-    var catColors = {
-        a: 'rgba(81,162,218,0.7)',  // Code (12 capabilities)
-        b: 'rgba(160,124,188,0.7)', // Build & Test (8)
-        c: 'rgba(229,151,40,0.7)',  // Release (10)
-        d: 'rgba(121,219,50,0.7)',  // Operate (8)
-        e: 'rgba(219,50,121,0.7)'   // Optimize (4)
-    };
-    var bgColors = [];
-    capFields.forEach(function(f) { bgColors.push(catColors[f[0]]); });
+    // One dataset per category so each gets its own legend entry
+    var catDefs = [
+        { key: 'a', label: 'Code', color: 'rgba(81,162,218,0.7)' },
+        { key: 'b', label: 'Build & Test', color: 'rgba(160,124,188,0.7)' },
+        { key: 'c', label: 'Release', color: 'rgba(229,151,40,0.7)' },
+        { key: 'd', label: 'Operate', color: 'rgba(121,219,50,0.7)' },
+        { key: 'e', label: 'Optimize', color: 'rgba(219,50,121,0.7)' }
+    ];
+    var barDatasets = catDefs.map(function(cat) {
+        return {
+            type: 'bar',
+            label: cat.label,
+            data: capFields.map(function(f, i) { return f[0] === cat.key ? capScores[i] : null; }),
+            backgroundColor: cat.color,
+            borderColor: 'transparent',
+            borderWidth: 0,
+            borderRadius: 3
+        };
+    });
 
     var ctx = document.getElementById("category-average-graph");
     var capChart = new Chart(ctx, {
@@ -205,30 +214,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 lineTension: 0.3,
                 pointRadius: 0,
                 fill: false
-            },{
-                type: 'bar',
-                label: 'Capabilities',
-                data: capScores,
-                backgroundColor: bgColors,
-                borderColor: 'transparent',
-                borderWidth: 0,
-                borderRadius: 3
-            }]
+            }].concat(barDatasets)
         },
         options: {
             layout: { padding: { bottom: 10 } },
             responsive: true,
             legend: { labels: { fontFamily: "'Inter', sans-serif", fontSize: 12, fontColor: '#4c4c4c' } },
             scales: {
-                xAxes: [{ ticks: { display: true, autoSkip: false, max: 5, minRotation: 60, maxRotation: 60, fontColor: '#6f81a6', fontSize: 11 }, gridLines: { display: false } }],
-                yAxes: [{ ticks: { min: 0, beginAtZero: true, max: 4, stepSize: 1, fontColor: '#6f81a6' }, gridLines: { color: 'rgba(0,0,0,0.05)' } }]
+                xAxes: [{ stacked: true, ticks: { display: true, autoSkip: false, max: 5, minRotation: 60, maxRotation: 60, fontColor: '#6f81a6', fontSize: 11 }, gridLines: { display: false } }],
+                yAxes: [{ stacked: true, ticks: { min: 0, beginAtZero: true, max: 4, stepSize: 1, fontColor: '#6f81a6' }, gridLines: { color: 'rgba(0,0,0,0.05)' } }]
             },
             onClick: function(evt, items) {
                 if (!items || !items.length) return;
-                // Find the bar element (dataset index 1), skip line elements
+                // Find the bar element, skip line elements (dataset index 0)
                 var barItem = null;
                 for (var j = 0; j < items.length; j++) {
-                    if (items[j]._datasetIndex === 1) { barItem = items[j]; break; }
+                    if (items[j]._datasetIndex >= 1) { barItem = items[j]; break; }
                 }
                 if (!barItem) barItem = items[0];
                 var idx = barItem._index;
