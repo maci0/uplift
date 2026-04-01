@@ -18,12 +18,12 @@
     <form method="post" action="/products/{{ product.id }}/tags/{{ tag.id }}">
         <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
         <div class="form-group">
-            <label for="key">Key</label>
-            <input type="text" name="key" id="key" value="{{ tag.key }}" class="form-control" required>
+            <label for="key">Key <span class="required">*</span></label>
+            <input type="text" name="key" id="key" value="{{ tag.key }}" class="form-control" required aria-required="true">
         </div>
         <div class="form-group">
-            <label for="value">Value</label>
-            <input type="text" name="value" id="value" value="{{ tag.value }}" class="form-control" required>
+            <label for="value">Value <span class="required">*</span></label>
+            <input type="text" name="value" id="value" value="{{ tag.value }}" class="form-control" required aria-required="true">
         </div>
         <button type="submit" class="button button--cta">Update Tag</button>
     </form>

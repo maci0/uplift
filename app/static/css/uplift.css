@@ -1015,6 +1015,7 @@ a:focus {
 }
 
 .cap-modal-close:hover { color: #1d252e; }
+.cap-modal-close:focus { outline: 2px solid #e59728; outline-offset: 2px; }
 
 .cap-modal-body {
     padding: 20px 24px 24px;

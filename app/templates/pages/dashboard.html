@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <!-- Capability detail modal -->
-<div id="cap-modal" class="cap-modal-backdrop" style="display:none;" onclick="if(event.target===this)closeCapModal()">
+<div id="cap-modal" class="cap-modal-backdrop" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="cap-modal-title" onclick="if(event.target===this)closeCapModal()">
     <div class="cap-modal">
         <div class="cap-modal-header">
             <h3 id="cap-modal-title"></h3>
@@ -147,9 +147,9 @@ document.addEventListener('DOMContentLoaded', function() {
         <table class="table table-hover table-bordered">
             <thead>
                 <tr>
-                    <th>Title</th>
-                    <th>Score</th>
-                    <th>Current Score Description</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Score</th>
+                    <th scope="col">Current Score Description</th>
                 </tr>
             </thead>
             <tbody>
@@ -251,12 +251,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     minEl.style.display = 'none';
                 }
                 document.getElementById('cap-modal').style.display = 'flex';
+                document.querySelector('.cap-modal-close').focus();
             }
         }
     });
 
+    var _capModalTrigger = null;
     function closeCapModal() {
         document.getElementById('cap-modal').style.display = 'none';
+        if (_capModalTrigger) { _capModalTrigger.focus(); _capModalTrigger = null; }
     }
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') closeCapModal();
