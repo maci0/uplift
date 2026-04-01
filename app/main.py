@@ -13,6 +13,7 @@ from app.middleware import RequestLoggingMiddleware
 from app.models.base import Base
 from app.routes import dashboard, products, scores, tags, pages, dump
 from app.routes import health
+from app.seed import seed_db
 
 # Configure logging before anything else
 setup_logging()
@@ -42,7 +43,6 @@ app.state.templates = templates
 
 # Create tables and seed
 Base.metadata.create_all(bind=engine)
-from app.seed import seed_db
 seed_db()
 
 # Register routers

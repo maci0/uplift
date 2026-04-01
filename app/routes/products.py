@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import APIRouter, Request, Depends, Form, Query
+from fastapi import APIRouter, Request, Depends, Query
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session, selectinload
 from sqlalchemy import func, or_
@@ -103,9 +103,9 @@ async def create(
     if not name or len(name) > 255 or product_type not in VALID_PRODUCT_TYPES:
         return RedirectResponse(url="/products/new", status_code=303)
     if url and len(url) > 500:
-        url = url[:500]
+        url = None
 
-    product = Product(name=name[:255], product_type=product_type, url=url, description=description, is_assessed=False)
+    product = Product(name=name, product_type=product_type, url=url, description=description, is_assessed=False)
     db.add(product)
     db.flush()
 
@@ -118,7 +118,6 @@ async def create(
             db.add(Tag(key=key, value=value, product_id=product.id))
 
     db.commit()
-    db.refresh(product)
     logger.info("product_created id=%d name=%s type=%s", product.id, sanitize_log(name), sanitize_log(product_type))
     return RedirectResponse(url=f"/products/{product.id}?msg=asset_created", status_code=303)
 
@@ -189,7 +188,7 @@ async def update(
     if not name or len(name) > 255 or product_type not in VALID_PRODUCT_TYPES:
         return RedirectResponse(url=f"/products/{product_id}/edit", status_code=303)
     if url and len(url) > 500:
-        url = url[:500]
+        url = None
 
     product.name = name[:255]
     product.product_type = product_type
