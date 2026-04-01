@@ -119,13 +119,6 @@ class Score(Base):
     def get_category_array(self) -> list[float]:
         return [self.a or 0, self.b or 0, self.c or 0, self.d or 0, self.e or 0]
 
-    def get_expanded_category_array(self) -> list[float]:
-        result = []
-        for cat_key, fields in CATEGORY_FIELDS.items():
-            val = getattr(self, cat_key, 0) or 0
-            result.extend([val] * len(fields))
-        return result
-
     def compute_totals(self, capabilities: dict) -> None:
         """Compute category averages and cloud readiness score.
 
