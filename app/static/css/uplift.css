@@ -180,10 +180,11 @@ footer {
 
 /* DASHBOARD */
 .stats {
-    padding: 24px 32px;
+    padding: 28px 32px;
     background: linear-gradient(135deg, #1d2d50 0%, #294172 100%);
     display: flex;
     gap: 16px;
+    overflow: visible;
 }
 
 .stats-col {
@@ -198,7 +199,6 @@ footer {
     border-radius: 12px;
     padding: 28px 20px;
     transition: background 0.2s, transform 0.2s;
-    backdrop-filter: blur(4px);
 }
 
 .stats-item:hover {
