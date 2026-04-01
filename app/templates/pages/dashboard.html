@@ -2,52 +2,6 @@
 {% block title %}Dashboard — Uplift{% endblock %}
 
 {% block content %}
-{% if first_visit %}
-<div class="first-time-page-wrapper" role="dialog" aria-modal="true" aria-label="Welcome to Uplift">
-    <div class="message-wrapper">
-        <div class="message-wrapper-header">
-            <div class="title">
-                <p class="text-center">Welcome to the Uplift portal! We're so glad you're here!</p>
-            </div>
-            <div class="close-modal">
-                <button type="button" style="cursor:pointer;font-size:20px;background:none;border:none;color:#fff;" onclick="closeModal()" aria-label="Close welcome dialog">&times;</button>
-            </div>
-        </div>
-        <div class="message-wrapper-body">
-            <div class="message-paginate active text-page">
-                <div class="message message-left">
-                    <h3 class="text-center"><b>Want to jump right in?</b></h3><br><br>
-                    <p class="message-body text-center">Ok, we get it. <a href="/products/new">Add a new Asset</a> to get started.</p>
-                    <p class="text-center message-button"><button class="button-aux" onclick="closeModal()">Get Started !!</button></p>
-                </div>
-                <div class="message message-right">
-                    <h3 class="text-center"><b>Got a couple minutes?</b></h3><br><br>
-                    <p class="message-body text-center"><a href="/docs">Check out our documentation</a> to learn more about Uplift and the maturity model.</p>
-                    <p class="text-center message-button"><a href="/docs" class="button-aux">Read the Docs</a></p>
-                </div>
-            </div>
-            <div class="message-wrapper-footer">
-                <div class="footer-close"><button type="button" class="footer-close-text pull-right" style="background:none;border:none;cursor:pointer;font-size:inherit;" onclick="closeModal()">Close [x]</button></div>
-            </div>
-        </div>
-    </div>
-</div>
-<script>
-function closeModal() {
-    document.querySelector('.first-time-page-wrapper').remove();
-    var mainContent = document.getElementById('main-content');
-    if (mainContent) mainContent.focus();
-}
-document.addEventListener('DOMContentLoaded', function() {
-    var modal = document.querySelector('.first-time-page-wrapper');
-    if (modal) {
-        var closeBtn = modal.querySelector('button[aria-label="Close welcome dialog"]');
-        if (closeBtn) closeBtn.focus();
-    }
-});
-</script>
-{% endif %}
-
 <div class="stats">
     <a href="/org-history" class="stats-col">
         <div class="stats-item">

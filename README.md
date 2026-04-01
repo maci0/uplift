@@ -86,7 +86,6 @@ All settings use the `UPLIFT_` env var prefix:
 |---|---|---|
 | `UPLIFT_DATABASE_URL` | `sqlite:///./uplift.db` | Database connection string |
 | `UPLIFT_ENABLE_ASSET_CREATION` | `true` | Allow creating new products |
-| `UPLIFT_ENABLE_FIRST_TIME_USER_EXP` | `true` | Show first-time user experience |
 | `UPLIFT_ENABLE_TAG_MODIFICATION` | `true` | Allow modifying tags |
 | `UPLIFT_SEED_DB` | `true` | Seed example products on first start |
 | `UPLIFT_SLACK_ENDPOINT` | | Slack webhook URL |

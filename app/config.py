@@ -11,7 +11,6 @@ except PackageNotFoundError:
 class Settings(BaseSettings):
     database_url: str = "sqlite:///./uplift.db"
     enable_asset_creation: bool = True
-    enable_first_time_user_exp: bool = True
     enable_tag_modification: bool = True
     seed_db: bool = True
     slack_endpoint: str = ""

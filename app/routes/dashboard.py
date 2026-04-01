@@ -13,11 +13,6 @@ router = APIRouter()
 
 @router.get("/")
 async def dashboard(request: Request, db: Session = Depends(get_db)):
-    # First-time visitor detection
-    first_visit = False
-    if settings.enable_first_time_user_exp and not request.cookies.get("first_visit"):
-        first_visit = True
-
     capabilities = load_capabilities()
 
     # Get summary: average of all latest scores
@@ -149,16 +144,9 @@ async def dashboard(request: Request, db: Session = Depends(get_db)):
             "cap_details_json": cap_details,
             "cat_expanded_json": cat_expanded,
             "recommendations": recommendations,
-            "first_visit": first_visit,
             "config": settings,
         },
     )
-
-    if first_visit:
-        response.set_cookie(
-            key="first_visit", value="1", max_age=365 * 24 * 3600,
-            httponly=True, samesite="lax",
-        )
 
     return response
 

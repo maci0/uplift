@@ -39,9 +39,8 @@ def log_startup_config() -> None:
     logger.info("Uplift v%s starting", VERSION)
     logger.info("database=%s", db_url)
     logger.info(
-        "features: asset_creation=%s first_time_ux=%s tag_modification=%s",
+        "features: asset_creation=%s tag_modification=%s",
         settings.enable_asset_creation,
-        settings.enable_first_time_user_exp,
         settings.enable_tag_modification,
     )
     logger.info("slack_configured=%s", bool(settings.slack_endpoint))
