@@ -180,16 +180,16 @@ footer {
 
 /* DASHBOARD */
 .stats {
-    padding: 24px;
+    padding: 24px 32px;
     background: linear-gradient(135deg, #1d2d50 0%, #294172 100%);
-    margin: 0 24px;
-    border-radius: 0 0 12px 12px;
-    overflow: hidden;
+    display: flex;
+    gap: 16px;
 }
 
-.stats.row {
-    margin-left: 0;
-    margin-right: 0;
+.stats-col {
+    flex: 1;
+    text-decoration: none;
+    color: inherit;
 }
 
 .stats-item {
@@ -910,6 +910,7 @@ a:focus {
     .message-left { border-right: none; border-bottom: 1px solid #8faed9; }
     .message-right { border-left: none; }
 
+    .stats { flex-direction: column; padding: 16px; }
     .stats-item { padding: 20px 16px; }
     .stats-val { font-size: 36px; }
 }

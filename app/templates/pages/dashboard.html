@@ -48,9 +48,8 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 {% endif %}
 
-<div class="stats row">
-    <div class="col-xs-6 col-md-4">
-        <a href="/org-history">
+<div class="stats">
+    <a href="/org-history" class="stats-col">
         <div class="stats-item">
             <div class="stats-title text-center">
                 <p>Native Cloud Readiness Score</p>
@@ -59,10 +58,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 <p>{{ summary.total }}%</p>
             </div>
         </div>
-        </a>
-    </div>
-    <div class="col-xs-6 col-md-4">
-        <a href="/products">
+    </a>
+    <a href="/products" class="stats-col">
         <div class="stats-item">
             <div class="stats-title text-center">
                 <p>Total Number of Assets</p>
@@ -71,11 +68,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 <p>{{ product_count }}</p>
             </div>
         </div>
-        </a>
-    </div>
+    </a>
     {% if config.enable_asset_creation %}
-    <div class="col-xs-6 col-md-4">
-        <a href="/products/new">
+    <a href="/products/new" class="stats-col">
         <div class="stats-item">
             <div class="stats-title text-center">
                 <p>Add a new Asset</p>
@@ -84,10 +79,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 <p>+</p>
             </div>
         </div>
-        </a>
-    </div>
+    </a>
     {% else %}
-    <div class="col-xs-6 col-md-4">
+    <div class="stats-col">
         <div class="stats-item">
             <div class="stats-title text-center">
                 <p>Adding asset feature has been disabled.</p>
