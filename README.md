@@ -61,12 +61,16 @@ docker-compose -f docker-compose.postgres.yml up --build
 
 ### OpenShift
 
+#### SQLite (with persistent storage)
+
 ```bash
 oc new-app https://github.com/maci0/uplift --strategy=docker
+oc set volume deploy/uplift --add --type=pvc --claim-name=uplift-data \
+  --claim-size=1Gi --mount-path=/app/data
 oc expose svc/uplift
 ```
 
-To use PostgreSQL, create a database first and set the connection string:
+#### PostgreSQL
 
 ```bash
 oc new-app postgresql-persistent --name=uplift-db \
