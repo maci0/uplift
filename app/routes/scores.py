@@ -107,11 +107,12 @@ async def create(request: Request, product_id: int, db: Session = Depends(get_db
 
     score.compute_totals(capabilities)
 
-    # Archive previous latest scores atomically (avoids race condition with concurrent submissions)
+    # Archive previous latest scores before inserting new one
     if product.is_assessed:
         db.query(Score).filter(
             Score.product_id == product_id, Score.latest.is_(True)
-        ).update({"latest": False})
+        ).update({"latest": False}, synchronize_session=False)
+        db.flush()
     else:
         product.is_assessed = True
 

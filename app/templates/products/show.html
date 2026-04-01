@@ -69,6 +69,16 @@
         </div>
     </div>
 
+    <!-- Spider chart -->
+    {% if cat_scores %}
+    <div class="detail-card" style="text-align:center;">
+        <h3 class="chart-card-title" style="text-align:left;">Category Overview</h3>
+        <div style="max-width:420px;margin:0 auto;">
+            <canvas id="radar-chart"></canvas>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Danger zone -->
     <div class="detail-danger">
         <form method="post" action="/products/{{ product.id }}/delete" style="display:inline"
@@ -78,4 +88,47 @@
         </form>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{% if cat_scores %}
+<script>
+new Chart(document.getElementById('radar-chart'), {
+    type: 'radar',
+    data: {
+        labels: {{ cat_labels | tojson }},
+        datasets: [{
+            label: '{{ product.name }}',
+            data: {{ cat_scores | tojson }},
+            backgroundColor: 'rgba(60, 110, 180, 0.2)',
+            borderColor: '#3c6eb4',
+            borderWidth: 2,
+            pointBackgroundColor: '#3c6eb4',
+            pointRadius: 4
+        }{% if org_cat_scores %},{
+            label: 'Org Average',
+            data: {{ org_cat_scores | tojson }},
+            backgroundColor: 'rgba(229, 151, 40, 0.1)',
+            borderColor: '#e59728',
+            borderWidth: 1,
+            borderDash: [4, 4],
+            pointRadius: 2,
+            pointBackgroundColor: '#e59728'
+        }{% endif %}]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        scale: {
+            ticks: { min: 0, max: 4, stepSize: 1 },
+            pointLabels: { fontSize: 13, fontFamily: "'Inter', sans-serif", fontColor: '#294172' }
+        },
+        legend: {
+            position: 'bottom',
+            labels: { fontFamily: "'Inter', sans-serif", fontSize: 12, fontColor: '#4c4c4c' }
+        }
+    }
+});
+</script>
+{% endif %}
 {% endblock %}

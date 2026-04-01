@@ -3,9 +3,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-_client = httpx.AsyncClient(timeout=10.0)
-
-
 async def send_to_slack(endpoint: str, channel: str, name: str, email: str, message: str) -> bool:
     """Send a feedback message to Slack webhook."""
     if not endpoint:
@@ -20,7 +17,8 @@ async def send_to_slack(endpoint: str, channel: str, name: str, email: str, mess
     }
 
     try:
-        response = await _client.post(endpoint, json=payload)
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            response = await client.post(endpoint, json=payload)
         if not response.is_success:
             logger.warning(
                 "Slack webhook returned status=%d channel=%s", response.status_code, channel

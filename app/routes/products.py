@@ -8,9 +8,10 @@ from math import ceil
 
 from app.database import get_db
 from app.models import Product, Tag, Score
+from app.capabilities import load_capabilities, CATEGORIES
 from app.config import settings
 from app.logging_config import sanitize_log
-from app.queries import get_active_product
+from app.queries import get_active_product, get_org_summary
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/products")
@@ -129,12 +130,26 @@ async def show(request: Request, product_id: int, db: Session = Depends(get_db))
     if not product:
         return RedirectResponse(url="/products", status_code=303)
 
+    # Build radar chart data if product has been assessed
+    capabilities = load_capabilities()
+    cat_labels = [capabilities.get(cat["key"], cat["key"]) for cat in CATEGORIES]
+    cat_scores = []
+    org_cat_scores = []
+    if product.latest_score:
+        cat_scores = [round(float(getattr(product.latest_score, cat["key"], 0) or 0), 2) for cat in CATEGORIES]
+        summary = get_org_summary(db)
+        if summary:
+            org_cat_scores = [round(float(getattr(summary, cat["key"], 0) or 0), 2) for cat in CATEGORIES]
+
     return request.app.state.templates.TemplateResponse(
         request,
         "products/show.html",
         context={
             "product": product,
             "total_scores": len(product.scores),
+            "cat_labels": cat_labels,
+            "cat_scores": cat_scores,
+            "org_cat_scores": org_cat_scores,
             "config": settings,
         },
     )
