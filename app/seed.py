@@ -1,6 +1,7 @@
 """Seed the database with example data."""
 import logging
 import random
+from datetime import datetime, timedelta
 from sqlalchemy.orm import Session
 from app.database import SessionLocal
 from app.models import Product, Score, Tag
@@ -45,12 +46,14 @@ SAMPLE_PRODUCTS = [
 ]
 
 
-def _create_score(db: Session, product: Product, capabilities: dict, *, base_level: int = 1) -> Score:
+def _create_score(db: Session, product: Product, capabilities: dict, *, base_level: int = 1, created_at: datetime | None = None) -> Score:
     """Create a score with random capability values biased around base_level."""
     score = Score(product_id=product.id)
     for f in ALL_CAPABILITY_FIELDS:
         setattr(score, f, min(4, max(1, base_level + random.randint(-1, 1))))
     score.compute_totals(capabilities)
+    if created_at:
+        score.created_at = created_at
     db.add(score)
     return score
 
@@ -81,15 +84,19 @@ def seed_db():
             for key, value in spec["tags"]:
                 db.add(Tag(key=key, value=value, product_id=product.id))
 
+            num_assessments = len(spec["assessments"])
+            now = datetime.utcnow()
             for i, base_level in enumerate(spec["assessments"]):
                 if i > 0:
-                    # Mark previous score as not latest and flush before inserting new one
                     prev = db.query(Score).filter(Score.product_id == product.id, Score.latest.is_(True)).first()
                     if prev:
                         prev.latest = False
                         db.flush()
 
-                _create_score(db, product, capabilities, base_level=base_level)
+                # Space assessments ~6 weeks apart, most recent is today
+                days_ago = (num_assessments - 1 - i) * 42
+                score_date = now - timedelta(days=days_ago)
+                _create_score(db, product, capabilities, base_level=base_level, created_at=score_date)
                 db.flush()
 
             product.is_assessed = True
