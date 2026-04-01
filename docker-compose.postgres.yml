@@ -1,10 +1,11 @@
 services:
   db:
     image: postgres:16-alpine
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: uplift
-      POSTGRES_PASSWORD: uplift
-      POSTGRES_DB: uplift
+      POSTGRES_USER: ${POSTGRES_USER:-uplift}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_DB: ${POSTGRES_DB:-uplift}
     ports:
       - "5432:5432"
     volumes:
@@ -12,10 +13,11 @@ services:
 
   web:
     build: .
+    restart: unless-stopped
     ports:
       - "8000:8000"
     environment:
-      - UPLIFT_DATABASE_URL=postgresql://uplift:uplift@db:5432/uplift
+      - UPLIFT_DATABASE_URL=postgresql://${POSTGRES_USER:-uplift}:${POSTGRES_PASSWORD:-changeme}@db:5432/${POSTGRES_DB:-uplift}
     depends_on:
       - db
     volumes:

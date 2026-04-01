@@ -4,6 +4,12 @@
 __pycache__
 *.pyc
 *.egg-info
+*.egg
 tmp
 .env
 .env.*
+.pytest_cache
+build
+dist
+docs/screenshots
+.playwright-mcp
