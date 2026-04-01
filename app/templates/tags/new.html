@@ -1,0 +1,31 @@
+{% extends "layout/base.html" %}
+{% block title %}Add Tag — Uplift{% endblock %}
+
+{% block content %}
+<div class="page__content subheader">
+    <div>
+        <ul class="breadcrumb">
+            <li><a href="/products">Assets</a></li>
+            <li><a href="/products/{{ product.id }}">{{ product.name }}</a></li>
+            <li class="active" aria-current="page">Add Tag</li>
+        </ul>
+        <h1 style="margin:4px 0 0">Add Tag</h1>
+    </div>
+    <a href="/products/{{ product.id }}" class="button pull-right">Back</a>
+</div>
+
+<div class="page__content main-content">
+    <form method="post" action="/products/{{ product.id }}/tags/">
+        <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
+        <div class="form-group">
+            <label for="key">Key <span class="required">*</span></label>
+            <input type="text" name="key" id="key" class="form-control" required aria-required="true" placeholder="e.g. team, environment, region">
+        </div>
+        <div class="form-group">
+            <label for="value">Value <span class="required">*</span></label>
+            <input type="text" name="value" id="value" class="form-control" required aria-required="true" placeholder="e.g. Platform, production">
+        </div>
+        <button type="submit" class="button button--cta">Add Tag</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Open source portal that measures the progress and maturity of products">
+    <meta property="og:title" content="Uplift">
+    <meta property="og:description" content="Uplift is an open source portal that measures the progress and maturity of products">
+    <title>{% block title %}Uplift{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/uplift.css">
+    <script src="/static/js/Chart.min.js"></script>
+    <script src="/static/js/htmx.min.js"></script>
+</head>
+<body class="page edp">
+    <a class="skip-nav" href="#main-content">Skip to main content</a>
+    <div class="wrapper">
+        <header>
+            <div class="page__content header" style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+                <div class="title"><a href="/"><img src="/static/img/logo.svg" alt="" width="28" height="28" style="vertical-align:middle;margin-right:8px;">Uplift</a></div>
+                <div>
+                    <nav class="navbar navbar-default navbar-uplift" aria-label="Main navigation">
+                        <div class="container-fluid">
+                            <button type="button" class="navbar-toggle" aria-expanded="false" aria-label="Toggle navigation" onclick="this.setAttribute('aria-expanded', this.getAttribute('aria-expanded') === 'false' ? 'true' : 'false'); this.parentElement.querySelector('.navbar-collapse').classList.toggle('in');">
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </button>
+                            <div class="collapse navbar-collapse">
+                                <ul class="nav navbar-nav navbar-right">
+                                    <li><a href="/"{% if request.url.path == '/' %} aria-current="page"{% endif %}>Home</a></li>
+                                    <li><a href="/docs"{% if request.url.path == '/docs' %} aria-current="page"{% endif %}>Docs</a></li>
+                                    <li><a href="/about"{% if request.url.path == '/about' %} aria-current="page"{% endif %}>About</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+        </header>
+        <div class="main-content-wrapper">
+            <main id="main-content" tabindex="-1">
+            {% block content %}{% endblock %}
+            </main>
+            <div class="slider-backdrop" onclick="closeSlider()"></div>
+            <div class="slider-wrapper" style="display:none" role="dialog" aria-modal="true" aria-label="Details panel">
+                <div class="slider-header">
+                    <div class="slider-title"></div>
+                    <div class="slider-closer">
+                        <button type="button" onclick="closeSlider()" aria-label="Close panel">&times;</button>
+                    </div>
+                </div>
+                <div class="slider-content"></div>
+            </div>
+        </div>
+
+        <div id="flash-toast" class="flash-toast" style="display:none" role="alert">
+            <span id="flash-toast-text"></span>
+            <button type="button" class="flash-toast-close" onclick="document.getElementById('flash-toast').style.display='none'" aria-label="Dismiss notification">&times;</button>
+        </div>
+        <footer>
+            <div class="page__content">
+                <div class="footer">
+                    <p>Uplift v{{ VERSION }} &middot; <a href="/docs">Documentation</a> &middot; <a href="https://github.com/maci0/uplift" rel="noopener noreferrer">GitHub</a></p>
+                </div>
+            </div>
+        </footer>
+    </div>
+    <script>
+        var _sliderTrigger = null;
+        function openSlider(className) {
+            _sliderTrigger = document.activeElement;
+            var source = document.querySelector("." + className);
+            var titleEl = source.querySelector(".title");
+            var contentEl = source.querySelector(".content");
+            var sliderTitle = document.querySelector(".slider-title");
+            var sliderContent = document.querySelector(".slider-content");
+            sliderTitle.textContent = "";
+            sliderContent.textContent = "";
+            sliderTitle.appendChild(titleEl.cloneNode(true));
+            sliderContent.appendChild(contentEl.cloneNode(true));
+            document.querySelector(".slider-wrapper").style.display = "block";
+            document.querySelector(".slider-backdrop").style.display = "block";
+            var closeBtn = document.querySelector(".slider-closer button");
+            if (closeBtn) closeBtn.focus();
+        }
+        function closeSlider() {
+            document.querySelector(".slider-wrapper").style.display = "none";
+            document.querySelector(".slider-backdrop").style.display = "none";
+            if (_sliderTrigger) { _sliderTrigger.focus(); _sliderTrigger = null; }
+        }
+        document.addEventListener("keydown", function(e) {
+            if (e.key === "Escape") closeSlider();
+        });
+        (function() {
+            var params = new URLSearchParams(window.location.search);
+            var msg = params.get("msg");
+            if (msg) {
+                var messages = {
+                    asset_created: "Asset created successfully.",
+                    asset_updated: "Asset updated successfully.",
+                    asset_deleted: "Asset removed successfully.",
+                    score_saved: "Score saved successfully.",
+                    tag_added: "Tag added successfully.",
+                    tag_updated: "Tag updated successfully.",
+                    tag_deleted: "Tag deleted successfully.",
+                    tag_duplicate: "A tag with that key already exists for this product.",
+                    feedback_sent: "Thank you! Your feedback has been sent."
+                };
+                var text = messages[msg];
+                if (text) {
+                    var toast = document.getElementById("flash-toast");
+                    document.getElementById("flash-toast-text").textContent = text;
+                    toast.style.display = "flex";
+                    var url = new URL(window.location);
+                    url.searchParams.delete("msg");
+                    history.replaceState({}, "", url);
+                    setTimeout(function() { toast.style.display = "none"; }, 6000);
+                }
+            }
+        })();
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

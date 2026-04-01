@@ -1,0 +1,43 @@
+{% extends "layout/base.html" %}
+{% block title %}About — Uplift{% endblock %}
+
+{% block content %}
+<div class="page__content subheader">
+    <h1>About Uplift</h1>
+</div>
+
+<div class="page__content main-content">
+    <h2>What is Uplift?</h2>
+    <p>Uplift helps organizations identify growth opportunities to eliminate waste, set clearly defined targets,
+       and measure progress while working toward the ultimate goal of continuous delivery.</p>
+
+    <p>The model charts a clear path that can be completed in stages and allows flexibility for progressing through
+       five key dimensions of software development: <strong>Code</strong>, <strong>Build &amp; Test</strong>,
+       <strong>Release</strong>, <strong>Operate</strong>, and <strong>Optimize</strong>.</p>
+
+    <h3>How It Works</h3>
+    <p>The model serves as a "cloud readiness" gauge that quantifies how close a product is to being ready
+       for migration. This is achieved by establishing targets for a subset of capabilities that define the
+       minimum requirements. Teams who own legacy products get a clear goal to work toward that they can easily
+       track, allowing organizations to operate in a decentralized, self-service way.</p>
+
+    <h3>FAQ</h3>
+
+    <h4>What are the dimensions?</h4>
+    <p>Products are evaluated across five categories: Code (development practices), Build &amp; Test (quality assurance),
+       Release (deployment capabilities), Operate (production management), and Optimize (continuous improvement).</p>
+
+    <h4>What is the scoring scale?</h4>
+    <p>Each capability is scored from 1 (initial/ad-hoc) to 4 (optimized/measured). Higher scores indicate
+       more mature practices.</p>
+
+    <h4>What is the Cloud Readiness Score?</h4>
+    <p>The overall percentage reflects how many capabilities with defined minimum thresholds are meeting those
+       minimums. A 100% score means all cloud-readiness requirements are met.</p>
+
+    <h4>Can I customize the model?</h4>
+    <p>Yes! The model is defined in YAML configuration files that can be easily modified to meet your
+       specific organizational needs. You can change capability descriptions, add new capabilities,
+       or adjust minimum thresholds.</p>
+</div>
+{% endblock %}

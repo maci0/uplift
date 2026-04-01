@@ -1,0 +1,13 @@
+{% extends "layout/base.html" %}
+{% block title %}New Asset — Uplift{% endblock %}
+
+{% block content %}
+<div class="page__content subheader">
+    <h1 class="pull-left">New Asset</h1>
+    <a href="/products" class="button pull-right">Back</a>
+</div>
+
+<div class="page__content main-content">
+    {% include "products/_form.html" %}
+</div>
+{% endblock %}

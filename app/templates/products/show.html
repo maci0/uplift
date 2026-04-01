@@ -1,0 +1,81 @@
+{% extends "layout/base.html" %}
+{% block title %}{{ product.name }} — Uplift{% endblock %}
+
+{% block content %}
+<div class="page__content subheader">
+    <div>
+        <ul class="breadcrumb">
+            <li><a href="/products">Assets</a></li>
+            <li class="active" aria-current="page">{{ product.name }}</li>
+        </ul>
+        <h1 style="margin:4px 0 0">{{ product.name }}</h1>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+        <a href="/products/{{ product.id }}/edit" class="button">Edit</a>
+        <a href="/products" class="button">All Assets</a>
+    </div>
+</div>
+
+<div class="detail-layout">
+    <!-- Info card -->
+    <div class="detail-card">
+        <div class="detail-card-header">
+            <span class="detail-type-badge">{{ product.product_type }}</span>
+            {% if product.url %}
+            <a href="{{ product.url }}" target="_blank" rel="noopener noreferrer" class="detail-url">{{ product.url }}</a>
+            {% endif %}
+        </div>
+        {% if product.description %}
+        <p class="detail-description">{{ product.description }}</p>
+        {% endif %}
+        <div class="detail-tags">
+            {% for tag in product.tags %}
+            <a href="/products/{{ product.id }}/tags/{{ tag.id }}/edit" class="product-tag">{{ tag.key }}&nbsp;:&nbsp;{{ tag.value }}</a>
+            {% endfor %}
+            <a href="/products/{{ product.id }}/tags/new" class="product-tag product-tag--add">+ Add Tag</a>
+        </div>
+    </div>
+
+    <!-- Score cards row -->
+    <div class="detail-stats">
+        <div class="detail-stat-card">
+            <div class="detail-stat-label">Cloud Score</div>
+            <div class="detail-stat-value {% if product.is_assessed and product.latest_score %}detail-stat-value--{{ 'green' if product.latest_score.total >= 80 else ('orange' if product.latest_score.total >= 40 else 'red') }}{% endif %}">
+                {% if product.is_assessed and product.scores %}
+                    {{ "%.0f"|format(product.latest_score.total or 0) }}%
+                {% else %}
+                    —
+                {% endif %}
+            </div>
+            {% if product.is_assessed and product.scores %}
+            <a href="/products/{{ product.id }}/scores/{{ product.latest_score.id }}" class="detail-stat-link">View details &rarr;</a>
+            {% endif %}
+        </div>
+        <div class="detail-stat-card">
+            <div class="detail-stat-label">Evaluations</div>
+            <div class="detail-stat-value">{{ total_scores if product.is_assessed else 0 }}</div>
+            {% if product.is_assessed %}
+            <a href="/products/{{ product.id }}/scores" class="detail-stat-link">View history &rarr;</a>
+            {% endif %}
+        </div>
+        <div class="detail-stat-card detail-stat-card--action">
+            {% if product.is_assessable %}
+            <a href="/products/{{ product.id }}/scores/new" class="button button--cta" style="width:100%;text-align:center;">
+                {{ "Re-Evaluate" if product.is_assessed else "Evaluate" }}
+            </a>
+            {% else %}
+            <button type="button" disabled class="button button--disabled" style="width:100%;text-align:center;">Evaluate</button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Danger zone -->
+    <div class="detail-danger">
+        <form method="post" action="/products/{{ product.id }}/delete" style="display:inline"
+              onsubmit="return confirm('Are you sure? This will permanently remove this asset and all its scores.')">
+            <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
+            <button type="submit" class="button button--dngr" style="font-size:12px;padding:6px 14px;">Remove Asset</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

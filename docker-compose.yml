@@ -1,0 +1,9 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - UPLIFT_DATABASE_URL=sqlite:///./uplift.db
+    volumes:
+      - ./data:/app/data

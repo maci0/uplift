@@ -1,0 +1,25 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: uplift
+      POSTGRES_PASSWORD: uplift
+      POSTGRES_DB: uplift
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - UPLIFT_DATABASE_URL=postgresql://uplift:uplift@db:5432/uplift
+    depends_on:
+      - db
+    volumes:
+      - ./data:/app/data
+
+volumes:
+  pgdata:

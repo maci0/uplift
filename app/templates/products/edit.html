@@ -1,0 +1,43 @@
+{% extends "layout/base.html" %}
+{% block title %}Edit {{ product.name }} — Uplift{% endblock %}
+
+{% block content %}
+<div class="page__content subheader">
+    <div>
+        <ul class="breadcrumb">
+            <li><a href="/products">Assets</a></li>
+            <li><a href="/products/{{ product.id }}">{{ product.name }}</a></li>
+            <li class="active" aria-current="page">Edit</li>
+        </ul>
+        <h1 style="margin:4px 0 0">Edit Asset</h1>
+    </div>
+    <a href="/products/{{ product.id }}" class="button pull-right">Back</a>
+</div>
+
+<div class="page__content main-content">
+    <form method="post" action="/products/{{ product.id }}">
+        <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" name="name" id="name" value="{{ product.name }}" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="product_type">Type</label>
+            <select name="product_type" id="product_type" class="form-control" required>
+                {% for t in ["Product", "Component", "Sub component", "Service", "Application"] %}
+                <option value="{{ t }}" {{ 'selected' if product.product_type == t else '' }}>{{ t }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="url">URL</label>
+            <input type="url" name="url" id="url" value="{{ product.url or '' }}" class="form-control" placeholder="https://github.com/...">
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea name="description" id="description" class="form-control" rows="3">{{ product.description or '' }}</textarea>
+        </div>
+        <button type="submit" class="button button--cta">Update Asset</button>
+    </form>
+</div>
+{% endblock %}

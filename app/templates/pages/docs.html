@@ -1,0 +1,64 @@
+{% extends "layout/base.html" %}
+{% block title %}Documentation — Uplift{% endblock %}
+
+{% block content %}
+<div class="page__content subheader">
+    <h1>Documentation</h1>
+</div>
+
+<div class="docs-layout">
+    <nav class="docs-nav" aria-label="Category navigation">
+        <div class="docs-nav-title">Categories</div>
+        {% for cat in categories %}
+        <a href="#cat-{{ cat.key }}" class="docs-nav-link">{{ capabilities[cat.key] }}</a>
+        {% endfor %}
+    </nav>
+
+    <div class="docs-content">
+        <div class="docs-intro">
+            <h2>Uplift Maturity Model</h2>
+            <p>The model evaluates products across <strong>5 categories</strong> and <strong>42 capabilities</strong>.
+               Each capability is scored on a scale of 1–4. Capabilities with a minimum threshold define cloud-readiness requirements.</p>
+            <div class="docs-legend">
+                <span class="docs-legend-item"><span class="docs-legend-dot" style="background:#dff3fb;"></span> Level 1</span>
+                <span class="docs-legend-item"><span class="docs-legend-dot" style="background:#bfe6f7;"></span> Level 2</span>
+                <span class="docs-legend-item"><span class="docs-legend-dot" style="background:#80ceef;"></span> Level 3</span>
+                <span class="docs-legend-item"><span class="docs-legend-dot" style="background:#0198E1;"></span> Level 4</span>
+                <span class="docs-legend-item"><span class="docs-legend-dot" style="background:#fbeedb;border:1px solid #e59728;"></span> Min threshold</span>
+            </div>
+        </div>
+
+        {% for cat in categories %}
+        <div id="cat-{{ cat.key }}" class="docs-category">
+            <h3 class="docs-category-title">{{ capabilities[cat.key] }}</h3>
+            <div class="table-responsive">
+            <table class="table table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th class="th-doc-cap" style="width:15%">Capability</th>
+                        <th class="th-doc-l1" style="width:20%">Level 1</th>
+                        <th class="th-doc-l2" style="width:20%">Level 2</th>
+                        <th class="th-doc-l3" style="width:20%">Level 3</th>
+                        <th class="th-doc-l4" style="width:20%">Level 4</th>
+                        <th class="th-doc-min" style="width:5%">Min</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for field in cat.fields %}
+                    <tr>
+                        <td class="td-doc-cap"><strong>{{ capabilities[field] }}</strong></td>
+                        <td>{{ capabilities.get(field ~ '_1', '') }}</td>
+                        <td>{{ capabilities.get(field ~ '_2', '') }}</td>
+                        <td>{{ capabilities.get(field ~ '_3', '') }}</td>
+                        <td>{{ capabilities.get(field ~ '_4', '') }}</td>
+                        <td>{{ capabilities.get(field ~ '_min', '') or '-' }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

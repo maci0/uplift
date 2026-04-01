@@ -1,0 +1,143 @@
+{% extends "layout/base.html" %}
+{% block title %}Score History for {{ product.name }} — Uplift{% endblock %}
+
+{% block content %}
+<div class="page__content subheader">
+    <div>
+        <ul class="breadcrumb">
+            <li><a href="/products">Assets</a></li>
+            <li><a href="/products/{{ product.id }}">{{ product.name }}</a></li>
+            <li class="active" aria-current="page">Scores</li>
+        </ul>
+        <h1 style="margin:4px 0 0">Score History</h1>
+    </div>
+    <a href="/products/{{ product.id }}" class="button pull-right">Back to Asset</a>
+</div>
+
+<div class="page__content main-content">
+    {% if scores %}
+    <div class="chart-card" style="margin-bottom:24px;">
+        <h2 class="chart-card-title">Score Trend</h2>
+        <canvas id="history-chart" width="400" height="120"></canvas>
+    </div>
+
+    <div class="table-responsive">
+    <table class="table table-hover table-bordered">
+        <thead>
+            <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Total Score</th>
+                <th scope="col">Code (A)</th>
+                <th scope="col">Build &amp; Test (B)</th>
+                <th scope="col">Release (C)</th>
+                <th scope="col">Operate (D)</th>
+                <th scope="col">Optimize (E)</th>
+                <th scope="col">Status</th>
+                <th scope="col"><span class="sr-only">Actions</span></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for s in scores %}
+            <tr>
+                <td>{{ s.created_at.strftime("%B %d, %Y") }}</td>
+                <td>{{ "%.2f"|format(s.total or 0) }}%</td>
+                <td>{{ "%.1f"|format(s.a or 0) }}</td>
+                <td>{{ "%.1f"|format(s.b or 0) }}</td>
+                <td>{{ "%.1f"|format(s.c or 0) }}</td>
+                <td>{{ "%.1f"|format(s.d or 0) }}</td>
+                <td>{{ "%.1f"|format(s.e or 0) }}</td>
+                <td>{{ "Latest" if s.latest else "Archived" }}</td>
+                <td><a href="/products/{{ product.id }}/scores/{{ s.id }}" class="button">View</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% else %}
+    <p>No scores have been recorded yet. <a href="/products/{{ product.id }}/scores/new">Evaluate this asset</a>.</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if scores %}
+<script>
+var ctx = document.getElementById("history-chart");
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: {{ history_labels | tojson }},
+        datasets: [{
+            label: "Cloud Score (%)",
+            data: {{ history_total | tojson }},
+            borderColor: '#3c6eb4',
+            backgroundColor: 'rgba(60, 110, 180, 0.1)',
+            borderWidth: 2,
+            pointBackgroundColor: '#fff',
+            pointBorderColor: '#3c6eb4',
+            pointRadius: 4,
+            yAxisID: 'y-total'
+        },{
+            label: "Code",
+            data: {{ history_cats.a | tojson }},
+            borderColor: '#51a2da',
+            borderWidth: 1,
+            pointRadius: 2,
+            fill: false,
+            yAxisID: 'y-cat'
+        },{
+            label: "Build & Test",
+            data: {{ history_cats.b | tojson }},
+            borderColor: '#a07cbc',
+            borderWidth: 1,
+            pointRadius: 2,
+            fill: false,
+            yAxisID: 'y-cat'
+        },{
+            label: "Release",
+            data: {{ history_cats.c | tojson }},
+            borderColor: '#e59728',
+            borderWidth: 1,
+            pointRadius: 2,
+            fill: false,
+            yAxisID: 'y-cat'
+        },{
+            label: "Operate",
+            data: {{ history_cats.d | tojson }},
+            borderColor: '#79db32',
+            borderWidth: 1,
+            pointRadius: 2,
+            fill: false,
+            yAxisID: 'y-cat'
+        },{
+            label: "Optimize",
+            data: {{ history_cats.e | tojson }},
+            borderColor: '#db3279',
+            borderWidth: 1,
+            pointRadius: 2,
+            fill: false,
+            yAxisID: 'y-cat'
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            yAxes: [{
+                id: 'y-total',
+                position: 'left',
+                ticks: { min: 0, max: 100, stepSize: 25, fontColor: '#3c6eb4' },
+                scaleLabel: { display: true, labelString: 'Cloud Score %', fontColor: '#3c6eb4' }
+            },{
+                id: 'y-cat',
+                position: 'right',
+                ticks: { min: 0, max: 4, stepSize: 1, fontColor: '#6f81a6' },
+                scaleLabel: { display: true, labelString: 'Category Avg', fontColor: '#6f81a6' },
+                gridLines: { drawOnChartArea: false }
+            }],
+            xAxes: [{ gridLines: { display: false } }]
+        }
+    }
+});
+</script>
+{% endif %}
+{% endblock %}

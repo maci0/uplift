@@ -1,0 +1,55 @@
+<form method="post" action="/products/">
+    <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
+    <div class="form-group">
+        <label for="name">Name <span class="required">*</span></label>
+        <input type="text" name="name" id="name" class="form-control" required aria-required="true">
+    </div>
+    <div class="form-group">
+        <label for="product_type">Type <span class="required">*</span></label>
+        <select name="product_type" id="product_type" class="form-control" required aria-required="true">
+            <option value="Product">Product</option>
+            <option value="Component">Component</option>
+            <option value="Sub component">Sub component</option>
+            <option value="Service">Service</option>
+            <option value="Application">Application</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="url">URL</label>
+        <input type="url" name="url" id="url" class="form-control" placeholder="https://github.com/...">
+    </div>
+    <div class="form-group">
+        <label for="description">Description</label>
+        <textarea name="description" id="description" class="form-control" rows="3" placeholder="Brief description of this asset"></textarea>
+    </div>
+    <div class="form-group">
+        <label>Tags</label>
+        <div id="tag-rows">
+            <div class="tag-row" style="display:flex;gap:8px;margin-bottom:8px;">
+                <input type="text" name="tag_key" class="form-control" placeholder="Key (e.g. team)" style="flex:1;">
+                <input type="text" name="tag_value" class="form-control" placeholder="Value (e.g. Platform)" style="flex:1;">
+            </div>
+        </div>
+        <button type="button" class="button-aux button-aux--minor" style="font-size:13px;padding:5px 12px;" onclick="addTagRow()">+ Add Tag</button>
+    </div>
+    <button type="submit" class="button button--cta">Create Asset</button>
+</form>
+<script>
+function addTagRow() {
+    var row = document.createElement('div');
+    row.className = 'tag-row';
+    row.style.cssText = 'display:flex;gap:8px;margin-bottom:8px;';
+    var keyInput = document.createElement('input');
+    keyInput.type = 'text'; keyInput.name = 'tag_key'; keyInput.className = 'form-control';
+    keyInput.placeholder = 'Key'; keyInput.style.flex = '1';
+    var valInput = document.createElement('input');
+    valInput.type = 'text'; valInput.name = 'tag_value'; valInput.className = 'form-control';
+    valInput.placeholder = 'Value'; valInput.style.flex = '1';
+    var removeBtn = document.createElement('button');
+    removeBtn.type = 'button'; removeBtn.textContent = '\u00D7';
+    removeBtn.style.cssText = 'background:none;border:none;color:#db3279;cursor:pointer;font-size:18px;padding:0 4px;';
+    removeBtn.onclick = function() { row.remove(); };
+    row.appendChild(keyInput); row.appendChild(valInput); row.appendChild(removeBtn);
+    document.getElementById('tag-rows').appendChild(row);
+}
+</script>

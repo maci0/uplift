@@ -1,0 +1,159 @@
+{% extends "layout/base.html" %}
+{% block title %}Score for {{ product.name }} — Uplift{% endblock %}
+
+{% block content %}
+<div class="page__content subheader">
+    <div>
+        <ul class="breadcrumb">
+            <li><a href="/products">Assets</a></li>
+            <li><a href="/products/{{ product.id }}">{{ product.name }}</a></li>
+            <li><a href="/products/{{ product.id }}/scores">Scores</a></li>
+            <li class="active" aria-current="page">{{ score.created_at.strftime("%b %d, %Y") }}</li>
+        </ul>
+        <h1 style="margin:4px 0 0">Score Details</h1>
+    </div>
+    <a href="/products/{{ product.id }}/scores" class="button button--cta pull-right">Show All Scores</a>
+</div>
+
+<div class="score-sidebar">
+    <div class="score-sidebar-item">
+        <div class="score-sidebar-title">
+            <p>Native Cloud Readiness Score</p>
+        </div>
+        <div class="score-sidebar-value">
+            <p>{{ "%.2f"|format(score.total or 0) }}%</p>
+        </div>
+    </div>
+    <div class="score-sidebar-item">
+        <canvas id="bar-score-graph"></canvas>
+    </div>
+</div>
+
+<div class="score-main">
+    <div class="score-main-title">
+        Score Details
+        <span role="img" aria-label="{{ score.comment if score.comment else 'No comments on this score' }}" title="{{ score.comment if score.comment else 'No comments on this score' }}">&#x24D8;</span>
+    </div>
+    <div class="score-main-sub-title">
+        <button type="button" class="button-aux" onclick="openSlider('slider-data')">SHOW DETAILED SCORE DESCRIPTION</button>
+        <br>
+        <p>Last Updated on: {{ score.created_at.strftime("%B %d, %Y") }}</p>
+    </div>
+    <div class="score-main-graph active">
+        <canvas id="line-score-graph"></canvas>
+    </div>
+</div>
+
+<div class="slider-data" style="display:none">
+    <div class="title"><h1>Score Details</h1></div>
+    <div class="content">
+        <table class="table table-hover table-bordered">
+            <thead>
+                <tr>
+                    <th class="th-detail">Title</th>
+                    <th class="th-detail">Score</th>
+                    <th class="th-detail">Current Score Description</th>
+                    <th class="th-detail">Next Level Description</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for cat in categories %}
+                {% for field in cat.fields %}
+                <tr>
+                    <td>{{ capabilities[field] }}</td>
+                    <td>{{ descriptions[field].score }}</td>
+                    <td>{{ descriptions[field].description }}</td>
+                    <td>{{ descriptions[field].next_description }}</td>
+                </tr>
+                {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+var capLabels = {{ cap_labels_json | tojson }};
+var capScores = {{ cap_scores_json | tojson }};
+var catExpanded = {{ cat_expanded_json | tojson }};
+var catLabels = {{ cat_labels_json | tojson }};
+var catScores = {{ cat_scores_json | tojson }};
+var orgCapScores = {{ org_cap_scores_json | tojson }};
+var orgCatScores = {{ org_cat_scores_json | tojson }};
+
+var ctx = document.getElementById("line-score-graph");
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: capLabels,
+        datasets: [{
+            label: "Capability Scores",
+            data: capScores,
+            backgroundColor: ['rgba(60, 110, 180, 0.2)'],
+            borderColor: '#294172',
+            borderWidth: 1,
+            pointBackgroundColor: "#fff",
+            pointHoverBackgroundColor: "#51a2da",
+            pointRadius: 3
+        },{
+            label: "Organizational Average",
+            data: orgCapScores,
+            fill: false,
+            backgroundColor: '#db3279',
+            borderColor: '#db3279',
+            borderWidth: 1,
+            pointRadius: 0
+        },{
+            type: 'line',
+            label: 'Category Score',
+            data: catExpanded,
+            borderColor: '#e59728',
+            borderWidth: 1,
+            lineTension: 0,
+            pointRadius: 0,
+            fill: false
+        }]
+    },
+    options: {
+        layout: { padding: { bottom: 30 } },
+        scales: {
+            yAxes: [{ ticks: { min: 0, beginAtZero: true, max: 4, stepSize: 1 } }],
+            xAxes: [{ ticks: { display: true, autoSkip: false, minRotation: 90 } }]
+        }
+    }
+});
+
+ctx = document.getElementById("bar-score-graph");
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: catLabels,
+        datasets: [{
+            label: "Average Category Score",
+            data: catScores,
+            backgroundColor: ['rgba(220,235,248,0.5)', 'rgba(170,208,238,0.5)', 'rgba(143,174,217,0.5)', 'rgba(81,162,218,0.5)', 'rgba(60,110,180,0.5)'],
+            borderColor: '#294172',
+            borderWidth: 1
+        },{
+            label: "Organizational Average",
+            type: 'line',
+            fill: false,
+            data: orgCatScores,
+            borderColor: '#db3279',
+            backgroundColor: '#db3279',
+            borderWidth: 1
+        }]
+    },
+    options: {
+        title: { display: true, text: 'Category Average' },
+        legend: { display: false },
+        scales: {
+            yAxes: [{ ticks: { min: 0, beginAtZero: true, max: 4, stepSize: 1 } }],
+            xAxes: [{ display: false }]
+        }
+    }
+});
+</script>
+{% endblock %}

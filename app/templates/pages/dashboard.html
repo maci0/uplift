@@ -1,0 +1,267 @@
+{% extends "layout/base.html" %}
+{% block title %}Dashboard — Uplift{% endblock %}
+
+{% block content %}
+{% if first_visit %}
+<div class="first-time-page-wrapper" role="dialog" aria-modal="true" aria-label="Welcome to Uplift">
+    <div class="message-wrapper">
+        <div class="message-wrapper-header">
+            <div class="title">
+                <p class="text-center">Welcome to the Uplift portal! We're so glad you're here!</p>
+            </div>
+            <div class="close-modal">
+                <button type="button" style="cursor:pointer;font-size:20px;background:none;border:none;color:#fff;" onclick="closeModal()" aria-label="Close welcome dialog">&times;</button>
+            </div>
+        </div>
+        <div class="message-wrapper-body">
+            <div class="message-paginate active text-page">
+                <div class="message message-left">
+                    <h3 class="text-center"><b>Want to jump right in?</b></h3><br><br>
+                    <p class="message-body text-center">Ok, we get it. <a href="/products/new">Add a new Asset</a> to get started.</p>
+                    <p class="text-center message-button"><button class="button-aux" onclick="closeModal()">Get Started !!</button></p>
+                </div>
+                <div class="message message-right">
+                    <h3 class="text-center"><b>Got a couple minutes?</b></h3><br><br>
+                    <p class="message-body text-center"><a href="/docs">Check out our documentation</a> to learn more about Uplift and the maturity model.</p>
+                    <p class="text-center message-button"><a href="/docs" class="button-aux">Read the Docs</a></p>
+                </div>
+            </div>
+            <div class="message-wrapper-footer">
+                <div class="footer-close"><button type="button" class="footer-close-text pull-right" style="background:none;border:none;cursor:pointer;font-size:inherit;" onclick="closeModal()">Close [x]</button></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+function closeModal() {
+    document.querySelector('.first-time-page-wrapper').remove();
+    var mainContent = document.getElementById('main-content');
+    if (mainContent) mainContent.focus();
+}
+document.addEventListener('DOMContentLoaded', function() {
+    var modal = document.querySelector('.first-time-page-wrapper');
+    if (modal) {
+        var closeBtn = modal.querySelector('button[aria-label="Close welcome dialog"]');
+        if (closeBtn) closeBtn.focus();
+    }
+});
+</script>
+{% endif %}
+
+<div class="stats row">
+    <div class="col-xs-6 col-md-4">
+        <a href="/org-history">
+        <div class="stats-item">
+            <div class="stats-title text-center">
+                <p>Native Cloud Readiness Score</p>
+            </div>
+            <div class="stats-val text-center">
+                <p>{{ summary.total }}%</p>
+            </div>
+        </div>
+        </a>
+    </div>
+    <div class="col-xs-6 col-md-4">
+        <a href="/products">
+        <div class="stats-item">
+            <div class="stats-title text-center">
+                <p>Total Number of Assets</p>
+            </div>
+            <div class="stats-val text-center">
+                <p>{{ product_count }}</p>
+            </div>
+        </div>
+        </a>
+    </div>
+    {% if config.enable_asset_creation %}
+    <div class="col-xs-6 col-md-4">
+        <a href="/products/new">
+        <div class="stats-item">
+            <div class="stats-title text-center">
+                <p>Add a new Asset</p>
+            </div>
+            <div class="stats-val text-center">
+                <p>+</p>
+            </div>
+        </div>
+        </a>
+    </div>
+    {% else %}
+    <div class="col-xs-6 col-md-4">
+        <div class="stats-item">
+            <div class="stats-title text-center">
+                <p>Adding asset feature has been disabled.</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="chart-card">
+    <h2 class="chart-card-title">Organization Capability Scores</h2>
+    <p style="font-size:12px;color:#6f81a6;margin:-8px 0 12px;">Click a bar to see level descriptions</p>
+    <canvas id="category-average-graph" width="400" height="100"></canvas>
+</div>
+
+<!-- Capability detail modal -->
+<div id="cap-modal" class="cap-modal-backdrop" style="display:none;" onclick="if(event.target===this)closeCapModal()">
+    <div class="cap-modal">
+        <div class="cap-modal-header">
+            <h3 id="cap-modal-title"></h3>
+            <button type="button" onclick="closeCapModal()" aria-label="Close" class="cap-modal-close">&times;</button>
+        </div>
+        <div class="cap-modal-body">
+            <div id="cap-modal-min" style="display:none;margin-bottom:12px;font-size:13px;color:#e59728;font-weight:600;"></div>
+            <div class="cap-modal-levels">
+                <div class="cap-modal-level" data-level="1"><div class="cap-modal-level-num">1</div><div class="cap-modal-level-text" id="cap-l1"></div></div>
+                <div class="cap-modal-level" data-level="2"><div class="cap-modal-level-num">2</div><div class="cap-modal-level-text" id="cap-l2"></div></div>
+                <div class="cap-modal-level" data-level="3"><div class="cap-modal-level-num">3</div><div class="cap-modal-level-text" id="cap-l3"></div></div>
+                <div class="cap-modal-level" data-level="4"><div class="cap-modal-level-num">4</div><div class="cap-modal-level-text" id="cap-l4"></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if recommendations %}
+<div class="chart-card" style="margin: 0 24px 24px 24px;">
+    <h2 class="chart-card-title">Recommendations</h2>
+    <div class="recs-list">
+        {% for rec in recommendations %}
+        <div class="rec-item rec-item--{{ rec.type }}">
+            <div class="rec-icon">
+                {% if rec.type == 'critical' %}
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                {% elif rec.type == 'strength' %}
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                {% else %}
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 16 16 12 12 8"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                {% endif %}
+            </div>
+            <div class="rec-content">
+                <div class="rec-title">{{ rec.title }}</div>
+                <div class="rec-text">{{ rec.text }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<div class="slider-data" style="display:none">
+    <div class="title"><h1>Organization wide Score Descriptions</h1></div>
+    <div class="content">
+        <table class="table table-hover table-bordered">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Score</th>
+                    <th>Current Score Description</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for cat in categories %}
+                {% for field in cat.fields %}
+                <tr>
+                    <td>{{ capabilities[field] }}</td>
+                    <td>{{ summary[field] }}</td>
+                    <td>
+                        {% set score_val = summary[field] | int %}
+                        {% if score_val > 0 %}
+                            {{ capabilities.get(field ~ '_' ~ score_val, '') }}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    var capLabels = {{ capability_labels | tojson }};
+    var capScores = {{ cap_scores_json | tojson }};
+    var capFields = {{ cap_fields_json | tojson }};
+    var capDetails = {{ cap_details_json | tojson }};
+    var catExpanded = {{ cat_expanded_json | tojson }};
+    var bgColors = [
+        'rgba(99,161,218,0.7)','rgba(99,161,218,0.7)','rgba(99,161,218,0.7)','rgba(99,161,218,0.7)','rgba(99,161,218,0.7)','rgba(99,161,218,0.7)','rgba(99,161,218,0.7)','rgba(99,161,218,0.7)','rgba(99,161,218,0.7)','rgba(99,161,218,0.7)','rgba(99,161,218,0.7)','rgba(99,161,218,0.7)',
+        'rgba(81,162,218,0.7)','rgba(81,162,218,0.7)','rgba(81,162,218,0.7)','rgba(81,162,218,0.7)','rgba(81,162,218,0.7)','rgba(81,162,218,0.7)','rgba(81,162,218,0.7)','rgba(81,162,218,0.7)',
+        'rgba(60,110,180,0.7)','rgba(60,110,180,0.7)','rgba(60,110,180,0.7)','rgba(60,110,180,0.7)','rgba(60,110,180,0.7)','rgba(60,110,180,0.7)','rgba(60,110,180,0.7)','rgba(60,110,180,0.7)','rgba(60,110,180,0.7)','rgba(60,110,180,0.7)',
+        'rgba(41,65,114,0.7)','rgba(41,65,114,0.7)','rgba(41,65,114,0.7)','rgba(41,65,114,0.7)','rgba(41,65,114,0.7)','rgba(41,65,114,0.7)','rgba(41,65,114,0.7)','rgba(41,65,114,0.7)',
+        'rgba(29,45,80,0.7)','rgba(29,45,80,0.7)','rgba(29,45,80,0.7)','rgba(29,45,80,0.7)'
+    ];
+
+    var ctx = document.getElementById("category-average-graph");
+    var capChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: capLabels,
+            datasets: [{
+                type: 'line',
+                label: 'Category Average',
+                data: catExpanded,
+                borderColor: '#e59728',
+                borderWidth: 2,
+                lineTension: 0.3,
+                pointRadius: 0,
+                fill: false
+            },{
+                type: 'bar',
+                label: 'Capabilities',
+                data: capScores,
+                backgroundColor: bgColors,
+                borderColor: 'transparent',
+                borderWidth: 0,
+                borderRadius: 3
+            }]
+        },
+        options: {
+            layout: { padding: { bottom: 10 } },
+            responsive: true,
+            legend: { labels: { fontFamily: "'Inter', sans-serif", fontSize: 12, fontColor: '#4c4c4c' } },
+            scales: {
+                xAxes: [{ ticks: { display: true, autoSkip: false, max: 5, minRotation: 60, maxRotation: 60, fontColor: '#6f81a6', fontSize: 11 }, gridLines: { display: false } }],
+                yAxes: [{ ticks: { min: 0, beginAtZero: true, max: 4, stepSize: 1, fontColor: '#6f81a6' }, gridLines: { color: 'rgba(0,0,0,0.05)' } }]
+            },
+            onClick: function(evt, items) {
+                if (!items || !items.length) return;
+                // Find the bar element (dataset index 1), skip line elements
+                var barItem = null;
+                for (var j = 0; j < items.length; j++) {
+                    if (items[j]._datasetIndex === 1) { barItem = items[j]; break; }
+                }
+                if (!barItem) barItem = items[0];
+                var idx = barItem._index;
+                var field = capFields[idx];
+                var detail = capDetails[field];
+                if (!detail) return;
+                var score = Math.round(capScores[idx]);
+                document.getElementById('cap-modal-title').textContent = detail.name;
+                for (var i = 1; i <= 4; i++) {
+                    document.getElementById('cap-l' + i).textContent = detail.levels[i - 1] || '';
+                    var levelEl = document.querySelector('.cap-modal-level[data-level="' + i + '"]');
+                    levelEl.classList.toggle('cap-modal-level--active', i === score);
+                }
+                var minEl = document.getElementById('cap-modal-min');
+                if (detail.min) {
+                    minEl.textContent = 'Minimum cloud-readiness threshold: Level ' + detail.min;
+                    minEl.style.display = 'block';
+                } else {
+                    minEl.style.display = 'none';
+                }
+                document.getElementById('cap-modal').style.display = 'flex';
+            }
+        }
+    });
+
+    function closeCapModal() {
+        document.getElementById('cap-modal').style.display = 'none';
+    }
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeCapModal();
+    });
+</script>
+{% endblock %}

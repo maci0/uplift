@@ -1,0 +1,39 @@
+{% extends "layout/base.html" %}
+{% block title %}Edit Tag — Uplift{% endblock %}
+
+{% block content %}
+<div class="page__content subheader">
+    <div>
+        <ul class="breadcrumb">
+            <li><a href="/products">Assets</a></li>
+            <li><a href="/products/{{ product.id }}">{{ product.name }}</a></li>
+            <li class="active" aria-current="page">Edit Tag</li>
+        </ul>
+        <h1 style="margin:4px 0 0">Edit Tag</h1>
+    </div>
+    <a href="/products/{{ product.id }}" class="button pull-right">Back</a>
+</div>
+
+<div class="page__content main-content">
+    <form method="post" action="/products/{{ product.id }}/tags/{{ tag.id }}">
+        <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
+        <div class="form-group">
+            <label for="key">Key</label>
+            <input type="text" name="key" id="key" value="{{ tag.key }}" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="value">Value</label>
+            <input type="text" name="value" id="value" value="{{ tag.value }}" class="form-control" required>
+        </div>
+        <button type="submit" class="button button--cta">Update Tag</button>
+    </form>
+
+    {% if config.enable_tag_modification %}
+    <form method="post" action="/products/{{ product.id }}/tags/{{ tag.id }}/delete" style="margin-top: 10px;"
+          onsubmit="return confirm('Are you sure you want to delete this tag?')">
+        <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
+        <button type="submit" class="button button--dngr">Delete Tag</button>
+    </form>
+    {% endif %}
+</div>
+{% endblock %}

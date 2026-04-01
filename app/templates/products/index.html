@@ -1,0 +1,46 @@
+{% extends "layout/base.html" %}
+{% block title %}Assets — Uplift{% endblock %}
+
+{% block content %}
+<div class="page__content subheader">
+    <h1>Assets</h1>
+    <div class="subheader-actions">
+        <label class="toggle-label">
+            <input id="assess-check" type="checkbox" name="assessed" value="1" {{ 'checked' if assessed == '1' else '' }}>
+            <span>Assessed only</span>
+        </label>
+        {% if config.enable_asset_creation %}
+        <a href="/products/new" class="button button--cta">+ New Asset</a>
+        {% endif %}
+    </div>
+</div>
+<div class="main-content">
+    <div class="search-bar">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);pointer-events:none;">
+            <circle cx="6.5" cy="6.5" r="5.5" stroke="#8c8c8c" stroke-width="1.5" fill="none"/>
+            <line x1="10.5" y1="10.5" x2="15" y2="15" stroke="#8c8c8c" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <label for="search-tags" class="sr-only">Filter assets by tag values</label>
+        <input id="search-tags" value="{{ query }}" class="form-control search-input" placeholder="Search by tag values..."
+               hx-get="/products"
+               hx-trigger="keyup changed delay:300ms"
+               hx-target="#product-results"
+               hx-include="#assess-check"
+               hx-indicator="#search-loading"
+               name="q">
+        <span id="search-loading" class="htmx-indicator" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:12px;color:#6f81a6;">Loading...</span>
+    </div>
+    <div id="product-results">
+        {% include "products/_products.html" %}
+    </div>
+</div>
+
+<script>
+document.getElementById('assess-check').addEventListener('change', function() {
+    var searchInput = document.getElementById('search-tags');
+    var q = searchInput.value;
+    var assessed = this.checked ? '1' : '';
+    htmx.ajax('GET', '/products?q=' + encodeURIComponent(q) + '&assessed=' + assessed, '#product-results');
+});
+</script>
+{% endblock %}

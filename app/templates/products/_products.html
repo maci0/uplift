@@ -1,0 +1,65 @@
+{% if not products %}
+<div class="empty-state">
+    <p class="empty-state-icon">&#x1F4E6;</p>
+    <p class="empty-state-text">No assets found.</p>
+    {% if config.enable_asset_creation %}
+    <a href="/products/new" class="button">Create your first asset</a>
+    {% endif %}
+</div>
+{% endif %}
+
+<div class="product-grid">
+{% for product in products %}
+    <a href="/products/{{ product.id }}" class="product-card">
+        <div class="product-card-header">
+            <h3 class="product-card-name">{{ product.name }}</h3>
+            <span class="product-card-type">{{ product.product_type }}</span>
+            {% if product.description %}
+            <p class="product-card-desc">{{ product.description[:80] }}{{ '...' if product.description|length > 80 else '' }}</p>
+            {% endif %}
+        </div>
+        <div class="product-card-score">
+            <canvas class="tile-score-chart" data-percentage="{{ product.latest_score.total or 0 if product.latest_score else 0 }}" aria-label="Score: {{ '%.0f'|format(product.latest_score.total or 0) if product.latest_score else 0 }}%" role="img"></canvas>
+        </div>
+        {% if product.tags %}
+        <div class="product-card-tags">
+            {% for tag in product.tags[:3] %}
+            <span class="product-card-tag">{{ tag.value }}</span>
+            {% endfor %}
+            {% if product.tags | length > 3 %}
+            <span class="product-card-tag product-card-tag--more">+{{ product.tags | length - 3 }}</span>
+            {% endif %}
+        </div>
+        {% endif %}
+        <div class="product-card-footer">
+            {% if product.is_assessed %}
+            <span class="product-card-status product-card-status--assessed">Assessed</span>
+            {% else %}
+            <span class="product-card-status product-card-status--pending">Not assessed</span>
+            {% endif %}
+            <span class="product-card-action">{{ "Re-Evaluate" if product.is_assessed else "Evaluate" }} &rarr;</span>
+        </div>
+    </a>
+{% endfor %}
+</div>
+
+{% if products %}
+<div class="text-center">
+    <nav aria-label="Pagination">
+        <ul class="pagination">
+            {% if page > 1 %}
+            <li><a href="/products?q={{ query | urlencode }}&assessed={{ assessed }}&page={{ page - 1 }}" hx-get="/products?q={{ query | urlencode }}&assessed={{ assessed }}&page={{ page - 1 }}" hx-target="#product-results" hx-push-url="true">&laquo; Prev</a></li>
+            {% endif %}
+            {% for p in range(1, total_pages + 1) %}
+            <li class="{{ 'active' if p == page else '' }}"><a href="/products?q={{ query | urlencode }}&assessed={{ assessed }}&page={{ p }}" hx-get="/products?q={{ query | urlencode }}&assessed={{ assessed }}&page={{ p }}" hx-target="#product-results" hx-push-url="true">{{ p }}</a></li>
+            {% endfor %}
+            {% if page < total_pages %}
+            <li><a href="/products?q={{ query | urlencode }}&assessed={{ assessed }}&page={{ page + 1 }}" hx-get="/products?q={{ query | urlencode }}&assessed={{ assessed }}&page={{ page + 1 }}" hx-target="#product-results" hx-push-url="true">Next &raquo;</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+{% endif %}
+
+<script src="/static/js/chart-util.js"></script>
+<script>initCharts();</script>

@@ -1,0 +1,151 @@
+{% extends "layout/base.html" %}
+{% block title %}Evaluate {{ product.name }} — Uplift{% endblock %}
+
+{% block content %}
+<div class="page__content subheader">
+    <div>
+        <ul class="breadcrumb">
+            <li><a href="/products">Assets</a></li>
+            <li><a href="/products/{{ product.id }}">{{ product.name }}</a></li>
+            <li class="active" aria-current="page">{{ "Re-Evaluate" if product.is_assessed else "Evaluate" }}</li>
+        </ul>
+        <h1 style="margin:4px 0 0">{{ "Updating" if product.is_assessed else "Adding" }} Score</h1>
+    </div>
+    <div>
+        <button id="form-submitter" class="button button--cta">Save Score</button>
+        <a href="/products/{{ product.id }}" class="button button--dngr">Cancel</a>
+    </div>
+</div>
+
+<div class="page__content main-content progressive-form-container">
+    <form id="score-form" method="post" action="/products/{{ product.id }}/scores/">
+        <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
+        <div class="progressive-form-wrapper">
+            <div class="progress" role="progressbar" aria-label="Evaluation progress" aria-valuenow="1" aria-valuemin="1" aria-valuemax="5">
+                {% for i in range(1, 6) %}
+                <div class="progress-bar pg-{{ i }}" style="background-color: {{ ['#dcebf8','#aad0ee','#8faed9','#51a2da','#3c6eb4'][i-1] }}"></div>
+                {% endfor %}
+            </div>
+            <p id="progress-step" class="sr-only" aria-live="polite">Step 1 of 5</p>
+
+            {% for cat in categories %}
+            <div class="progressive-form pf-{{ loop.index }}">
+                <div class="progressive-form-header">
+                    {% if not loop.first %}
+                    <div class="pull-left"><button type="button" class="button-aux button-aux--minor" onclick="paginate({{ loop.index }}, 'P')">Back</button></div>
+                    {% endif %}
+                    <h3 class="progressive-form-title text-center"><strong>{{ capabilities[cat.key] }}</strong></h3>
+                    {% if not loop.last %}
+                    <div class="pull-right"><button type="button" class="button-aux button-aux--minor" onclick="paginate({{ loop.index }}, 'N')">Next</button></div>
+                    {% endif %}
+                </div>
+                <div style="clear:both; height:7px"></div>
+                <div class="progressive-form-content">
+                    <table class="table table-hover table-bordered">
+                        <tr>
+                            <th class="progressive-form-meta th-meta">Title</th>
+                            <th class="progressive-form-level th-level-1">Level 1</th>
+                            <th class="progressive-form-level th-level-2">Level 2</th>
+                            <th class="progressive-form-level th-level-3">Level 3</th>
+                            <th class="progressive-form-level th-level-4">Level 4</th>
+                            <th class="progressive-form-meta th-min">Min Score</th>
+                        </tr>
+                        {% for field in cat.fields %}
+                        <tr>
+                            <td class="td-field-name">{{ capabilities[field] }}</td>
+                            {% for level in range(1, 5) %}
+                            <td class="selectable{% if prefill.get(field) == level %} selected{% endif %}">
+                                <label>
+                                    <span class="sr-only">{{ capabilities[field] }} — Level {{ level }}: </span>
+                                    {{ formatted_capabilities.get(field ~ '_' ~ level, '') | safe }}
+                                    <input type="radio" name="{{ field }}" value="{{ level }}"
+                                        {% if prefill.get(field) == level %}checked{% endif %}>
+                                </label>
+                            </td>
+                            {% endfor %}
+                            <td>{{ capabilities.get(field ~ '_min', '') or '' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    {% if not loop.first %}
+                    <div class="pull-left"><button type="button" class="button-aux button-aux--minor" onclick="paginate({{ loop.index }}, 'P')">Back</button></div>
+                    {% endif %}
+                    {% if not loop.last %}
+                    <div class="pull-right"><button type="button" class="button-aux button-aux--minor" onclick="paginate({{ loop.index }}, 'N')">Next</button></div>
+                    {% endif %}
+                </div>
+
+                {% if loop.last %}
+                <div class="input-group" style="margin-top: 15px;">
+                    <label for="comment">Comment</label>
+                    <textarea name="comment" id="comment" class="progressive-form-comment form-control" placeholder="Please give a description for this score">{{ prefill.get('comment', '') }}</textarea>
+                </div>
+                <div class="actions" style="margin-top: 10px;">
+                    <button type="submit" class="button button--cta">Save Score</button>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById("form-submitter").addEventListener("click", function() {
+    this.disabled = true;
+    this.textContent = "Saving...";
+    document.getElementById("score-form").submit();
+});
+
+// Show only the first form section
+document.addEventListener("DOMContentLoaded", function() {
+    var forms = document.querySelectorAll(".progressive-form");
+    var bars = document.querySelectorAll(".progress-bar");
+    forms.forEach(function(f) { f.style.display = "none"; });
+    bars.forEach(function(b) { b.style.display = "none"; });
+    if (forms.length > 0) {
+        forms[0].style.display = "block";
+        bars[0].style.display = "block";
+    }
+
+    // Highlight pre-selected radio buttons
+    document.querySelectorAll(".selectable").forEach(function(cell) {
+        if (cell.querySelector("input[type=radio]:checked")) {
+            cell.classList.add("selected");
+        }
+    });
+});
+
+function paginate(pageNum, action) {
+    var forms = document.querySelectorAll(".progressive-form");
+    var bars = document.querySelectorAll(".progress-bar");
+    var stepEl = document.getElementById("progress-step");
+    forms.forEach(function(f) { f.style.display = "none"; });
+    var newStep;
+    if (action === "P") {
+        forms[pageNum - 2].style.display = "block";
+        bars[pageNum - 1].style.display = "none";
+        newStep = pageNum - 1;
+    } else {
+        forms[pageNum].style.display = "block";
+        bars[pageNum].style.display = "block";
+        newStep = pageNum + 1;
+    }
+    if (stepEl) stepEl.textContent = "Step " + newStep + " of " + forms.length;
+    var progressEl = document.querySelector('.progress');
+    if (progressEl) progressEl.setAttribute('aria-valuenow', newStep);
+}
+
+document.querySelectorAll(".selectable").forEach(function(cell) {
+    cell.addEventListener("click", function() {
+        var radio = this.querySelector("input[type=radio]");
+        radio.checked = true;
+        var siblings = this.parentElement.querySelectorAll(".selectable");
+        siblings.forEach(function(s) { s.classList.remove("selected"); });
+        this.classList.add("selected");
+    });
+});
+</script>
+{% endblock %}
