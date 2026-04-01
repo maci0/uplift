@@ -9,7 +9,7 @@ router = APIRouter()
 
 @router.get("/github")
 async def github_redirect():
-    return RedirectResponse(url="https://github.com/maci0/uplift")
+    return RedirectResponse(url="https://github.com/maci0/uplift", status_code=303)
 
 
 @router.get("/docs")

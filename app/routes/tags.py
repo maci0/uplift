@@ -40,6 +40,10 @@ async def create(
     if not product:
         return RedirectResponse(url="/products", status_code=303)
 
+    key, value = key.strip(), value.strip()
+    if not key or not value or len(key) > 255 or len(value) > 255:
+        return RedirectResponse(url=f"/products/{product_id}/tags/new", status_code=303)
+
     tag = Tag(key=key, value=value, product_id=product_id)
     db.add(tag)
     try:
@@ -88,6 +92,10 @@ async def update(
     product = get_active_product(db, product_id)
     if not product:
         return RedirectResponse(url="/products", status_code=303)
+
+    key, value = key.strip(), value.strip()
+    if not key or not value or len(key) > 255 or len(value) > 255:
+        return RedirectResponse(url=f"/products/{product_id}/tags/{tag_id}/edit", status_code=303)
 
     tag = get_tag(db, tag_id, product_id)
     if tag:

@@ -100,10 +100,12 @@ async def create(
     url = form_data.get("url", "").strip() or None
     description = form_data.get("description", "").strip() or None
 
-    if not name or product_type not in VALID_PRODUCT_TYPES:
+    if not name or len(name) > 255 or product_type not in VALID_PRODUCT_TYPES:
         return RedirectResponse(url="/products/new", status_code=303)
+    if url and len(url) > 500:
+        url = url[:500]
 
-    product = Product(name=name, product_type=product_type, url=url, description=description, is_assessed=False)
+    product = Product(name=name[:255], product_type=product_type, url=url, description=description, is_assessed=False)
     db.add(product)
     db.flush()
 
@@ -184,10 +186,12 @@ async def update(
     url = form_data.get("url", "").strip() or None
     description = form_data.get("description", "").strip() or None
 
-    if not name or product_type not in VALID_PRODUCT_TYPES:
+    if not name or len(name) > 255 or product_type not in VALID_PRODUCT_TYPES:
         return RedirectResponse(url=f"/products/{product_id}/edit", status_code=303)
+    if url and len(url) > 500:
+        url = url[:500]
 
-    product.name = name
+    product.name = name[:255]
     product.product_type = product_type
     product.url = url
     product.description = description
