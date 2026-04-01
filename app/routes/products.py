@@ -94,7 +94,7 @@ async def create(
     if not settings.enable_asset_creation:
         return RedirectResponse(url="/products", status_code=303)
 
-    form_data = await request.form()
+    form_data = getattr(request.state, "form_data", None) or await request.form()
     name = form_data.get("name", "").strip()
     product_type = form_data.get("product_type", "")
     url = form_data.get("url", "").strip() or None
@@ -180,7 +180,7 @@ async def update(
     if not product:
         return RedirectResponse(url="/products", status_code=303)
 
-    form_data = await request.form()
+    form_data = getattr(request.state, "form_data", None) or await request.form()
     name = form_data.get("name", "").strip()
     product_type = form_data.get("product_type", "")
     url = form_data.get("url", "").strip() or None

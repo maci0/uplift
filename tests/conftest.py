@@ -10,6 +10,8 @@ from app.database import get_db
 from app.models import Base, Product, Score
 from app.main import app
 
+CSRF_COOKIE = "csrf_token"
+
 # In-memory SQLite for tests — StaticPool ensures all connections share the same database
 _test_engine = create_engine(
     "sqlite:///:memory:",

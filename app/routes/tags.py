@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import APIRouter, Request, Depends, Form
+from fastapi import APIRouter, Request, Depends
 from fastapi.responses import RedirectResponse
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -32,15 +32,15 @@ async def new(request: Request, product_id: int, db: Session = Depends(get_db)):
 async def create(
     request: Request,
     product_id: int,
-    key: str = Form(...),
-    value: str = Form(...),
     db: Session = Depends(get_db),
 ):
     product = get_active_product(db, product_id)
     if not product:
         return RedirectResponse(url="/products", status_code=303)
 
-    key, value = key.strip(), value.strip()
+    form_data = getattr(request.state, "form_data", None) or await request.form()
+    key = (form_data.get("key", "") or "").strip()
+    value = (form_data.get("value", "") or "").strip()
     if not key or not value or len(key) > 255 or len(value) > 255:
         return RedirectResponse(url=f"/products/{product_id}/tags/new", status_code=303)
 
@@ -82,8 +82,6 @@ async def update(
     request: Request,
     product_id: int,
     tag_id: int,
-    key: str = Form(...),
-    value: str = Form(...),
     db: Session = Depends(get_db),
 ):
     if not settings.enable_tag_modification:
@@ -93,7 +91,9 @@ async def update(
     if not product:
         return RedirectResponse(url="/products", status_code=303)
 
-    key, value = key.strip(), value.strip()
+    form_data = getattr(request.state, "form_data", None) or await request.form()
+    key = (form_data.get("key", "") or "").strip()
+    value = (form_data.get("value", "") or "").strip()
     if not key or not value or len(key) > 255 or len(value) > 255:
         return RedirectResponse(url=f"/products/{product_id}/tags/{tag_id}/edit", status_code=303)
 

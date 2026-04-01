@@ -30,6 +30,9 @@ class CSRFMiddleware(BaseHTTPMiddleware):
 
         if request.method not in _SAFE_METHODS:
             form = await request.form()
+            # Cache form data on request.state so downstream routes can access it
+            # (BaseHTTPMiddleware + call_next consumes the body stream)
+            request.state.form_data = form
             form_token = form.get(CSRF_FIELD, "")
             if not form_token or not secrets.compare_digest(token, form_token):
                 return HTMLResponse("CSRF validation failed", status_code=403)

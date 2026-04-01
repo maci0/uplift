@@ -93,7 +93,7 @@ async def create(request: Request, product_id: int, db: Session = Depends(get_db
     if not product or not product.is_assessable:
         return RedirectResponse(url="/products", status_code=303)
 
-    form_data = await request.form()
+    form_data = getattr(request.state, "form_data", None) or await request.form()
     capabilities = load_capabilities()
 
     score = Score(product_id=product_id)
