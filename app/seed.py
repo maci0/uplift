@@ -1,7 +1,7 @@
 """Seed the database with example data."""
 import logging
 import random
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
 from app.database import SessionLocal
 from app.models import Product, Score, Tag
@@ -85,7 +85,7 @@ def seed_db():
                 db.add(Tag(key=key, value=value, product_id=product.id))
 
             num_assessments = len(spec["assessments"])
-            now = datetime.utcnow()
+            now = datetime.now(timezone.utc)
             for i, base_level in enumerate(spec["assessments"]):
                 if i > 0:
                     prev = db.query(Score).filter(Score.product_id == product.id, Score.latest.is_(True)).first()

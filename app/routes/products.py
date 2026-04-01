@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/products")
 
 PER_PAGE = 10
-VALID_PRODUCT_TYPES = {"Product", "Component", "Sub component"}
+VALID_PRODUCT_TYPES = {"Product", "Component", "Sub component", "Service", "Application"}
 
 
 @router.get("/")
@@ -85,9 +85,6 @@ async def new(request: Request):
     )
 
 
-VALID_PRODUCT_TYPES_EXTENDED = VALID_PRODUCT_TYPES | {"Service", "Application"}
-
-
 @router.post("/")
 async def create(
     request: Request,
@@ -102,7 +99,7 @@ async def create(
     url = form_data.get("url", "").strip() or None
     description = form_data.get("description", "").strip() or None
 
-    if not name or product_type not in VALID_PRODUCT_TYPES_EXTENDED:
+    if not name or product_type not in VALID_PRODUCT_TYPES:
         return RedirectResponse(url="/products/new", status_code=303)
 
     product = Product(name=name, product_type=product_type, url=url, description=description, is_assessed=False)
@@ -172,7 +169,7 @@ async def update(
     url = form_data.get("url", "").strip() or None
     description = form_data.get("description", "").strip() or None
 
-    if not name or product_type not in VALID_PRODUCT_TYPES_EXTENDED:
+    if not name or product_type not in VALID_PRODUCT_TYPES:
         return RedirectResponse(url=f"/products/{product_id}/edit", status_code=303)
 
     product.name = name

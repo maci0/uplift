@@ -9,7 +9,7 @@ router = APIRouter()
 
 @router.get("/github")
 async def github_redirect():
-    return RedirectResponse(url="https://github.com/techmaturity/techmaturity")  # TODO: update when repo is renamed
+    return RedirectResponse(url="https://github.com/maci0/uplift")
 
 
 @router.get("/docs")

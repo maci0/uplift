@@ -6,6 +6,8 @@
 
 Assessment portal that measures product maturity across five dimensions of software development. Teams self-assess against 42 capabilities scored on a 1-4 scale, producing a maturity profile that highlights strengths, gaps, and cloud-readiness.
 
+> **Note:** Uplift does not include authentication or authorization. It is designed to be deployed as an internal tool behind your organization's existing network controls (VPN, reverse proxy with SSO, etc.).
+
 ## Screenshots
 
 ![Dashboard](docs/screenshots/dashboard.png)

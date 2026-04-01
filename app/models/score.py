@@ -127,7 +127,11 @@ class Score(Base):
         return result
 
     def compute_totals(self, capabilities: dict) -> None:
-        """Compute category averages and overall total from capability thresholds. Sets latest=True."""
+        """Compute category averages and cloud readiness score.
+
+        Sets self.a-e to category averages, self.total to the percentage (0-100)
+        of capabilities meeting their minimum threshold, and self.latest to True.
+        """
         for cat_key, fields in CATEGORY_FIELDS.items():
             values = [getattr(self, f) for f in fields if getattr(self, f) is not None]
             if values:
