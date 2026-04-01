@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="app/static/img/logo.svg" alt="Uplift" width="64" height="64">
+</p>
+
 # Uplift
 
 Assessment portal that measures product maturity across five dimensions of software development. Teams self-assess against 42 capabilities scored on a 1-4 scale, producing a maturity profile that highlights strengths, gaps, and cloud-readiness.
