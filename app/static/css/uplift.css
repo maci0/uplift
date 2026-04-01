@@ -180,8 +180,10 @@ footer {
 
 /* DASHBOARD */
 .stats {
-    padding: 24px 16px;
+    padding: 24px;
     background: linear-gradient(135deg, #1d2d50 0%, #294172 100%);
+    margin: 0 24px;
+    border-radius: 0 0 12px 12px;
 }
 
 .stats-item {
