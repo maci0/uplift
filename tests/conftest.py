@@ -36,10 +36,7 @@ def client(db):
     """FastAPI TestClient with the get_db dependency overridden to use the test session."""
 
     def _override_get_db():
-        try:
-            yield db
-        finally:
-            pass
+        yield db
 
     app.dependency_overrides[get_db] = _override_get_db
     with TestClient(app, raise_server_exceptions=False) as c:
