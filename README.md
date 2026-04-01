@@ -59,6 +59,25 @@ docker-compose up --build
 docker-compose -f docker-compose.postgres.yml up --build
 ```
 
+### OpenShift
+
+```bash
+oc new-app https://github.com/maci0/uplift --strategy=docker
+oc expose svc/uplift
+```
+
+To use PostgreSQL, create a database first and set the connection string:
+
+```bash
+oc new-app postgresql-persistent --name=uplift-db \
+  -p POSTGRESQL_USER=uplift \
+  -p POSTGRESQL_PASSWORD=changeme \
+  -p POSTGRESQL_DATABASE=uplift
+oc new-app https://github.com/maci0/uplift --strategy=docker \
+  -e UPLIFT_DATABASE_URL=postgresql://uplift:changeme@uplift-db:5432/uplift
+oc expose svc/uplift
+```
+
 ## Configuration
 
 All settings use the `UPLIFT_` env var prefix:
